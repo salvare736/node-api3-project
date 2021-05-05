@@ -7,8 +7,13 @@ const Posts = require('../posts/posts-model');
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
+router.get('/', logger, (req, res, next) => {
   // RETURN AN ARRAY WITH ALL THE USERS
+  Users.get()
+    .then(users => {
+      res.status(200).json(users);
+    })
+    .catch(next);
 });
 
 router.get('/:id', (req, res) => {
@@ -41,6 +46,14 @@ router.post('/:id/posts', (req, res) => {
   // RETURN THE NEWLY CREATED USER POST
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
+});
+
+router.use((err, req, res, next) => { // eslint-disable-line
+  res.status(err.status || 500).json({
+    note: 'Something nasty went down in users router',
+    message: err.message,
+    stack: err.stack
+  });
 });
 
 // do not forget to export the router
