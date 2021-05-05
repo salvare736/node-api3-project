@@ -1,6 +1,6 @@
 const Users = require('../users/users-model');
-const Posts = require('../posts/posts-model');
 
+// logs API request details
 function logger(req, res, next) {
   console.log(`
     ${new Date()}
@@ -13,11 +13,12 @@ function logger(req, res, next) {
   next();
 }
 
+// checks if the user id exists
 async function validateUserId(req, res, next) {
   try {
     const user = await Users.getById(req.params.id)
     if (!user) {
-      next({ status: 404, message: `user not found` });
+      next({ status: 404, message: 'user not found' });
     } else {
       req.user = user;
       next();
@@ -27,6 +28,7 @@ async function validateUserId(req, res, next) {
   }
 }
 
+// checks if the body contains required user data ("name" field)
 async function validateUser(req, res, next) {
   try {
     const newUser = req.body;
@@ -41,8 +43,19 @@ async function validateUser(req, res, next) {
   }
 }
 
-function validatePost(req, res, next) {
-  // DO YOUR MAGIC
+// checks if the body contains required post data ("text" field)
+async function validatePost(req, res, next) {
+  try {
+    const newPost = req.body;
+    if (!newPost.text) {
+      next({ status: 400, message: 'missing required text field' });
+    } else {
+      req.newPost = newPost;
+      next();
+    }
+  } catch (err) {
+    next(err);
+  }
 }
 
-module.exports = { logger, validateUserId, validateUser, validatePost }
+module.exports = { logger, validateUserId, validateUser, validatePost };
