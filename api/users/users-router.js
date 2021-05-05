@@ -1,14 +1,10 @@
-// You will need `users-model.js` and `posts-model.js` both
-// The middleware functions also need to be required
 const express = require('express');
 const { logger, validateUserId, validateUser, validatePost } = require('../middleware/middleware');
 const Users = require('./users-model');
 const Posts = require('../posts/posts-model');
-
 const router = express.Router();
 
 router.get('/', logger, (req, res, next) => {
-  // RETURN AN ARRAY WITH ALL THE USERS
   Users.get()
     .then(users => {
       res.status(200).json(users);
@@ -17,8 +13,6 @@ router.get('/', logger, (req, res, next) => {
 });
 
 router.get('/:id', logger, validateUserId, (req, res, next) => { // eslint-disable-line
-  // RETURN THE USER OBJECT
-  // this needs a middleware to verify user id
   res.json(req.user);
 });
 
@@ -34,8 +28,6 @@ router.put('/:id', logger, (req, res, next) => {
 });
 
 router.delete('/:id', logger, validateUserId, (req, res, next) => {
-  // RETURN THE FRESHLY DELETED USER OBJECT
-  // this needs a middleware to verify user id
   Users.remove(req.params.id)
     .then(() => {
       res.status(200).json(req.user);
@@ -44,8 +36,6 @@ router.delete('/:id', logger, validateUserId, (req, res, next) => {
 });
 
 router.get('/:id/posts', logger, validateUserId, (req, res, next) => {
-  // RETURN THE ARRAY OF USER POSTS
-  // this needs a middleware to verify user id
   Users.getUserPosts(req.params.id)
     .then(posts => {
       res.status(200).json(posts);
@@ -66,7 +56,5 @@ router.use((err, req, res, next) => { // eslint-disable-line
     stack: err.stack
   });
 });
-
-// do not forget to export the router
 
 module.exports = router;
