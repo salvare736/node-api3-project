@@ -12,19 +12,24 @@ router.get('/', logger, (req, res, next) => {
     .catch(next);
 });
 
-router.get('/:id', logger, validateUserId, (req, res, next) => { // eslint-disable-line
+router.get('/:id', logger, validateUserId, (req, res) => { 
   res.json(req.user);
 });
 
-router.post('/', logger, (req, res, next) => {
-  // RETURN THE NEWLY CREATED USER OBJECT
-  // this needs a middleware to check that the request body is valid
+router.post('/', logger, validateUser, (req, res, next) => {
+  Users.insert(req.newUser)
+    .then(() => {
+      res.status(200).json(req.newUser);
+    })
+    .catch(next);  
 });
 
-router.put('/:id', logger, (req, res, next) => {
-  // RETURN THE FRESHLY UPDATED USER OBJECT
-  // this needs a middleware to verify user id
-  // and another middleware to check that the request body is valid
+router.put('/:id', logger, validateUser, validateUserId, (req, res, next) => {
+  Users.update(req.params.id, req.newUser)
+    .then(() => {
+      res.status(200).json(req.newUser);
+    })
+    .catch(next);
 });
 
 router.delete('/:id', logger, validateUserId, (req, res, next) => {

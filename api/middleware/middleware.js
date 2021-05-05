@@ -27,8 +27,18 @@ async function validateUserId(req, res, next) {
   }
 }
 
-function validateUser(req, res, next) {
-  // DO YOUR MAGIC
+async function validateUser(req, res, next) {
+  try {
+    const newUser = req.body;
+    if (!newUser.name) {
+      next({ status: 400, message: 'missing required name field' });
+    } else {
+      req.newUser = newUser;
+      next();
+    }
+  } catch (err) {
+    next(err);
+  }
 }
 
 function validatePost(req, res, next) {
