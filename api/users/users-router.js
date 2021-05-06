@@ -14,15 +14,19 @@ router.get('/', logger, (req, res, next) => {
 });
 
 // get user by id
-router.get('/:id', logger, validateUserId, (req, res) => { 
-  res.json(req.user);
+router.get('/:id', logger, validateUserId, (req, res, next) => { 
+  Users.getById(req.params.id)
+    .then(searchedUser => {
+      res.json(searchedUser);
+    })
+    .catch(next);
 });
 
 // create new user
 router.post('/', logger, validateUser, (req, res, next) => {
   Users.insert(req.newUser)
-    .then(() => {
-      res.status(200).json(req.newUser);
+    .then((user) => {
+      res.status(200).json(user);
     })
     .catch(next);  
 });
@@ -31,7 +35,10 @@ router.post('/', logger, validateUser, (req, res, next) => {
 router.put('/:id', logger, validateUser, validateUserId, (req, res, next) => {
   Users.update(req.params.id, req.newUser)
     .then(() => {
-      res.status(200).json(req.newUser);
+      return Users.getById(req.params.id);
+    })
+    .then((user) => {
+      res.json(user);
     })
     .catch(next);
 });
@@ -58,8 +65,8 @@ router.get('/:id/posts', logger, validateUserId, (req, res, next) => {
 router.post('/:id/posts', logger, validatePost, validateUserId, (req, res, next) => {
   const postInfo = { ...req.body, user_id: req.params.id };
   Posts.insert(postInfo)
-    .then(() => {
-      res.status(200).json(req.newPost);
+    .then(newlyCreatedPost => {
+      res.status(200).json(newlyCreatedPost);
     })
     .catch(next);
 });
